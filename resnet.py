@@ -149,7 +149,7 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def load_weight(self):
-        return self.linear.weight
+        return self.linear.weight, self.linear.bias
 
     def load_vec(self):
         return self.latent_vec
