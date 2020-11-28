@@ -83,11 +83,11 @@ def collect_advs(model, data_loader, epsilon):
                 data_grad = batch_grad[i]
                 perturbed_image = fgsm_attack(data, epsilon, data_grad)
                 #batch[i] = perturbed_image
-                _, perutb_predict = model(perturbed_image.view(1,3,32,32)).max(1)
+                _, perturb_predict = model(perturbed_image.view(1,3,32,32)).max(1)
                 #print("Output shape", perutb_predict)
                 #check perturbed one is also adversarial
-                if perutb_predict.item() != predicted[i].item():
-                    adv_instances.append((perturbed_image.cpu(), label[i].item()))
+                if perturb_predict.item() != predicted[i].item():
+                    adv_instances.append((perturbed_image.cpu(), label[i].item(), perturb_predict.item()))
         train_iter.set_description(f'[# of Collected Adv Instances : {len(adv_instances)}]', False)
     return adv_instances
 
@@ -107,8 +107,14 @@ def fgsm_attack(image, epsilon, data_grad):
     return perturbed_image
 
 class AdvDataSet(Dataset):
-    def __init__(self, adv_instances):
-        self.adv_instances = adv_instances
+    def __init__(self, adv_instances, need_perturb_label):
+        self.need_perturb_label = need_perturb_label
+        if self.need_perturb_label:
+            self.adv_instances = adv_instances
+        else:
+            self.adv_instances = []
+            for instance in adv_instances:
+                self.adv_instances.append((instance[0], instance[1]))
 
     def slicing(self, shuffle_seed=None, slice_by=1000):
         if not shuffle_seed:

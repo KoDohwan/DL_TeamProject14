@@ -148,6 +148,12 @@ class ResNet(nn.Module):
             self.in_planes = planes * block.expansion
         return nn.Sequential(*layers)
 
+    def load_weight(self):
+        return self.linear.weight
+
+    def load_vec(self):
+        return self.latent_vec
+
     def forward(self, x, lin=0, lout=5):
         out = x
         if lin < 1 and lout > -1:
@@ -165,6 +171,7 @@ class ResNet(nn.Module):
         if lout > 4:
             out = F.avg_pool2d(out, 4)
             out = out.view(out.size(0), -1)
+            self.latent_vec = out
             out = self.linear(out)
         return out
 
