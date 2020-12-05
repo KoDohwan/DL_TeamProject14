@@ -87,7 +87,7 @@ def collect_advs(model, data_loader, epsilon):
                 #print("Output shape", perutb_predict)
                 #check perturbed one is also adversarial
                 if perturb_predict.item() != predicted[i].item():
-                    adv_instances.append((perturbed_image.cpu(), label[i].item(), perturb_predict.item()))
+                    adv_instances.append((perturbed_image.cpu(), label[i].item(), perturb_predict.item(), data.cpu().detach()))
         train_iter.set_description(f'[# of Collected Adv Instances : {len(adv_instances)}]', False)
     return adv_instances
 
